@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "Tender": {
+      "title": "Tender",
+      "description": "A public offering for a contract or project.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the tender." },
+        "description": { "type": "string", "description": "Detailed description of the requirement." },
+        "organizationId": { "type": "string", "description": "ID of the organization that posted the tender." },
+        "organizationName": { "type": "string", "description": "Name of the organization." },
+        "category": { "type": "string", "description": "Industry category (e.g., Construction, IT, Health)." },
+        "budget": { "type": "string", "description": "Budget range or estimation." },
+        "deadline": { "type": "string", "format": "date-time", "description": "Submission deadline." },
+        "status": { "type": "string", "enum": ["open", "closed", "under-review", "awarded"], "description": "Current status of the tender." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "organizationId", "deadline", "status"]
+    },
+    "Bid": {
+      "title": "Bid",
+      "description": "A proposal submitted by a consumer or vendor for a tender.",
+      "type": "object",
+      "properties": {
+        "tenderId": { "type": "string", "description": "ID of the tender being bid on." },
+        "tenderTitle": { "type": "string", "description": "Title of the tender being bid on." },
+        "organizationName": { "type": "string", "description": "Name of the organization that issued the tender." },
+        "userId": { "type": "string", "description": "ID of the user submitting the bid." },
+        "userName": { "type": "string", "description": "Name of the bidder." },
+        "proposal": { "type": "string", "description": "The bid proposal details." },
+        "amount": { "type": "number", "description": "The bid amount." },
+        "status": { "type": "string", "enum": ["submitted", "accepted", "rejected"], "description": "Status of the bid." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tenderId", "tenderTitle", "userId", "proposal", "amount", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Application user profile.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["consumer", "organization"], "description": "User role: consumer (bidder) or organization (issuer)." },
+        "organizationName": { "type": "string", "description": "Name of organization if role is organization." },
+        "contactEmail": { "type": "string", "description": "Public contact email." },
+        "phoneNumber": { "type": "string", "description": "Contact phone number." },
+        "description": { "type": "string", "description": "About the organization or user." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A message sent between an organization and a bidder.",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string", "description": "ID of the user who sent the message." },
+        "senderName": { "type": "string", "description": "Display name of the sender." },
+        "content": { "type": "string", "description": "The message text." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "receiverId": { "type": "string", "description": "UID of the message recipient." }
+      },
+      "required": ["senderId", "senderName", "content", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Represents a user notification.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user who receives the notification." },
+        "title": { "type": "string", "description": "Short title of the notification." },
+        "message": { "type": "string", "description": "Detailed notification message." },
+        "type": { "type": "string", "enum": ["bid_submitted", "status_changed", "message_received"], "description": "Type of event triggering the notification." },
+        "relatedId": { "type": "string", "description": "ID of the related entity (bid or tender)." },
+        "read": { "type": "boolean", "description": "Whether the notification has been read." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "type", "relatedId", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/tenders/{tenderId}": {
+      "schema": "Tender",
+      "description": "Collection of all publicly offered tenders."
+    },
+    "/tenders/{tenderId}/bids/{bidId}": {
+      "schema": "Bid",
+      "description": "Bids submitted specifically for a given tender."
+    },
+    "/tenders/{tenderId}/bids/{bidId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Real-time messages exchanged for a specific bid."
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile information."
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications."
+    }
+  }
+}
